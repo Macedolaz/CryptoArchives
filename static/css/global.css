@@ -1,0 +1,63 @@
+body {
+  margin: 0;
+  line-height: normal;
+  font-family: var(--cryptowalletcom-inter-bold-575);
+  font-size: var(--font-size-xl); /* Tamanho base da fonte */
+}
+
+:root {
+  /* fonts */
+  --cryptowalletcom-inter-bold-575: 'Inter', sans-serif;
+
+  /* font sizes */
+  --font-size-xl: 1rem; /* 20px */
+  --font-size-13xl: 1.6rem; /* 32px */
+  --font-size-5xl: 1.2rem; /* 24px */
+  --font-size-9xl: 1.4rem; /* 28px */
+  --cryptowalletcom-inter-bold-575-size: 2.875rem; /* 57.5px */
+  --font-size-17xl: 1.8rem; /* 36px */
+  --font-size-mini: 0.75rem; /* 15px */
+  --font-size-181xl: 10rem; /* 200px */
+  --font-size-29xl: 2.4rem; /* 48px */
+
+  /* Colors */
+  --color-black: #000;
+  --cryptowalletcom-nero: #fff;
+  --color-darkgray: #999;
+  --color-gray-100: #1f1d22;
+  --color-gray-200: #1d182e;
+  --color-gray-300: #181027;
+  --color-gray-400: #161026;
+  --color-darkslategray: #323232;
+  --color-indigo: #4f329b;
+  --color-gainsboro: rgba(217, 217, 217, 0.1);
+  --color-blueviolet: #9747ff;
+  --color-darkslateblue: #442c84;
+
+  /* Gaps */
+  --gap-11xl: 1.5rem; /* 30px */
+
+  /* Paddings */
+  --padding-9xs: 0.2rem; /* 4px */
+  --padding-xs: 0.6rem; /* 12px */
+  --padding-18xl: 1.85rem; /* 37px */
+  --padding-61xl: 4rem; /* 80px */
+
+  /* Border radiuses */
+  --br-xl: 1rem; /* 20px */
+  --br-3xs: 0.5rem; /* 10px */
+}
+
+/* Ajuste de espaçamentos e preenchimentos */
+.container {
+  padding: var(--padding-xs); 
+  margin-bottom: var(--gap-11xl); 
+}
+
+/* Ajuste para telas menores */
+@media (max-width: 768px) {
+  .container {
+      padding: var(--padding-9xs); 
+  }
+}
+

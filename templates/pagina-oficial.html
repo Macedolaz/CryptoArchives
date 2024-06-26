@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1, width=device-width" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pagina-oficial.css') }}" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    />
+  </head>
+  <body>
+    <div class="pagina-oficial">
+      <div class="gallery" id="gallery">
+        {% for image in images %}
+        <div class="gallery-item" data-filename="{{ image }}">
+          <img src="{{ url_for('static', filename='uploads/' ~ session['email'] ~ '/' ~ image) }}" alt="{{ image }}">
+          <p>{{ image }}</p>
+        </div>
+        {% endfor %}
+      </div>
+
+      <div id="context-menu" class="context-menu">
+        <ul>
+            <li id="move-to-trash">Deletar</li>
+        </ul>
+      </div>
+
+      <div class="pagina-oficial-child"></div>
+      <div class="pagina-oficial-item"></div>
+      <div class="pagina-oficial-inner"></div>
+      <div class="line-div"></div>
+      <div class="pagina-oficial-child1"></div>
+      <img class="icon-person" alt="" src="{{ url_for('static', filename='public/-icon-person.svg') }}" />
+      <img class="ellipse-icon" alt="" src="{{ url_for('static', filename='public/ellipse-4.svg') }}" />
+      <div class="upload">
+        <form id="upload-form" enctype="multipart/form-data">
+          <label for="file-upload" class="custom-file-upload">UPLOAD</label>
+          <input id="file-upload" type="file" name="file"/>
+        </form>
+      </div>
+      <div class="pagina-oficial-child2"></div>
+      <div class="pagina-oficial-child3"></div>
+      <div class="pesquisa">
+        <div class="pesquisa-child"></div>
+        <div class="pesquisar-arquivo">Pesquisar arquivo</div>
+      </div>
+      <div class="recentes">
+        <div class="recentes1">Recentes</div>
+        <img class="icon-clock" alt="" src="{{ url_for('static', filename='public/-icon-clock.svg') }}" />
+      </div>
+      <div class="meus-arquivos">
+        <div class="meus-arquivos1">Meus arquivos</div>
+        <img class="icon-document" alt="" src="{{ url_for('static', filename='public/-icon-document.svg') }}" />
+      </div>
+      <div class="lixeira">
+        <div class="lixeira1">Lixeira</div>
+        <img class="icon-trash" alt="" src="{{ url_for('static', filename='public/-icon-trash.svg') }}" />
+      </div>
+      <img class="icon-magnifying-glass" alt="" src="{{ url_for('static', filename='public/-icon-magnifying-glass.svg') }}"/>
+      <img class="logo-foda-1" alt="" src="{{ url_for('static', filename='public/logo-foda-1@2x.png') }}" id="logoFoda1" />
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script>
+      document.getElementById('file-upload').addEventListener('change', function() {
+      var form = document.getElementById('upload-form');
+      var formData = new FormData(form);
+      fetch('/upload', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.text())
+      .then(data => {
+        location.reload();
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+    });
+      var logoFoda1 = document.getElementById("logoFoda1");
+      if (logoFoda1) {
+        logoFoda1.addEventListener("click", function (e) {
+          window.location.href = "{{ url_for('login') }}";
+        });
+      }
+
+      // Custom context menu handling
+      const contextMenu = document.getElementById('context-menu');
+        let selectedGalleryItem = null;
+
+        document.addEventListener('contextmenu', function(event) {
+            if (event.target.closest('.gallery-item')) {
+                event.preventDefault();
+                selectedGalleryItem = event.target.closest('.gallery-item');
+                contextMenu.style.top = `${event.pageY}px`;
+                contextMenu.style.left = `${event.pageX}px`;
+                contextMenu.classList.add('active');
+            } else {
+                contextMenu.classList.remove('active');
+            }
+        });
+
+        document.addEventListener('click', function() {
+            contextMenu.classList.remove('active');
+        });
+
+        document.getElementById('move-to-trash').addEventListener('click', function() {
+            if (selectedGalleryItem) {
+                const trash = document.getElementById('trash-items');
+                selectedGalleryItem.classList.add('trash-item');
+                selectedGalleryItem.classList.remove('gallery-item');
+                trash.appendChild(selectedGalleryItem);
+                selectedGalleryItem = null;
+                contextMenu.classList.remove('active');
+            }
+        });
+
+        document.getElementById('trash').addEventListener('click', function(event) {
+            if (event.target.closest('.trash-item')) {
+                const gallery = document.getElementById('gallery');
+                const item = event.target.closest('.trash-item');
+                item.classList.add('gallery-item');
+                item.classList.remove('trash-item');
+                gallery.appendChild(item);
+            }
+        });
+
+    </script>
+  </body>
+</html>
