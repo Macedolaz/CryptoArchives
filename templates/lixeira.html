@@ -1,0 +1,136 @@
+<!-- lixeira.html -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pagina-oficial.css') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+    <style>
+        .gallery-item {
+            position: relative;
+            margin: 10px;
+            display: inline-block;
+        }
+        .gallery-item img {
+            max-width: 150px;
+        }
+        .delete-button {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="pagina-oficial">
+        <div class="gallery" id="gallery">
+            {% for image in images %}
+                <div class="gallery-item" data-filename="{{ image }}">
+                    <img src="{{ url_for('download_file', filename=image) }}" alt="{{ image }}">
+                    <p>{{ image }}</p>
+                    <button class="delete-button" data-filename="{{ image }}">Deletar Permanentemente</button>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="pagina-oficial-child"></div>
+        <div class="pagina-oficial-item"></div>
+        <div class="pagina-oficial-inner"></div>
+        <div class="line-div"></div>
+        <div class="pagina-oficial-child1"></div>
+        
+        
+        <div class="pagina-oficial-child2"></div>
+        <div class="pagina-oficial-child3"></div>
+
+        <div class="profile">
+            <img class="icon-person" alt="" src="{{ url_for('static', filename='public/-icon-person.svg') }}" />
+            <img class="ellipse-icon" alt="" src="{{ url_for('static', filename='public/ellipse-4.svg') }}" />
+            <div id="profile-menu" class="profile-menu">
+                <ul>
+                    <li><a href="#">Meu Perfil</a></li>
+                    <li><a href="#">Configurações</a></li>
+                    <li><a href="#" id="logout">Sair</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="pesquisa">
+            <div class="pesquisa-child"></div>
+            <div class="pesquisar-arquivo">Pesquisar arquivo</div>
+        </div>
+
+        <div class="recentes">
+            <button id="recentes">Recentes</button>
+            <img class="icon-clock" alt="" src="{{ url_for('static', filename='public/-icon-clock.svg') }}">
+        </div>
+
+        <div class="meus-arquivos">
+            <button id="meusArquivos">Meus Arquivos</button>
+            <img class="icon-document" alt="" src="{{ url_for('static', filename='public/-icon-document.svg') }}">
+        </div>
+
+        <img class="icon-magnifying-glass" alt="" src="{{ url_for('static', filename='public/-icon-magnifying-glass.svg') }}">
+        <img class="logo-foda-1" alt="" src="{{ url_for('static', filename='public/logo-foda-1@2x.png') }}" id="logoFoda1">
+
+        <script>
+            document.querySelectorAll('.delete-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const filename = this.getAttribute('data-filename');
+                    fetch(`/delete_permanent/${filename}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            this.parentElement.remove();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                });
+            });
+
+            document.getElementById('recentes').addEventListener('click', function() {
+            window.location.href = "{{ url_for('oficial') }}";
+        });
+
+        document.getElementById('meusArquivos').addEventListener('click', function() {
+            window.location.href = "{{ url_for('oficial') }}";
+        });
+
+        const profileIcon = document.querySelector('.profile');
+        const profileMenu = document.getElementById('profile-menu');
+
+        profileIcon.addEventListener('click', function(event) {
+            profileMenu.classList.toggle('active');
+            event.stopPropagation();
+        });
+
+        document.addEventListener('click', function() {
+            profileMenu.classList.remove('active');
+        });
+
+        profileMenu.addEventListener('click', function(event) {
+            event.stopPropagation();
+        });
+
+        document.getElementById('logout').addEventListener('click', function() {
+            window.location.href = "{{ url_for('logout') }}";
+        });
+
+        </script>
+    </div>
+</body>
+</html>

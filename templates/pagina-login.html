@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/pagina-login.css') }}">
+  <script src="https://kit.fontawesome.com/cf6fa412bd.js" crossorigin="anonymous"></script>
+  <link rel="shortcut icon" href="static\public\favicon.ico" type="image/x-icon">
+</head>
+<body>
+  <div class="container">
+    <div class="buttonsForm">
+      <div class="btnColor"></div>
+      <button id="btnSignin">Sign in</button>
+      <button id="btnSignup">Sign up</button>
+    </div>
+
+    <form id="signin" action="/login" method="post">
+      <h5 class="texto">Digite sua frase semente!</h5>
+      <div class="flex">
+        <input type="text" name="palavra_semente" placeholder="Frase semente" required />
+      </div>
+      <button type="submit">Sign in</button>
+    </form>
+
+    <form id="signup" action="/signup" method="post">
+      <input type="email" name="email" id="signupEmail" placeholder="Email" required />
+      <i class="fas fa-envelope iEmail"></i>
+      <div class="divCheck">
+        <input type="checkbox" required />
+        <span>Terms</span>
+      </div>
+      <button type="submit">Sign up</button>
+    </form>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/index.js') }}"></script>
+</body>
+</html>

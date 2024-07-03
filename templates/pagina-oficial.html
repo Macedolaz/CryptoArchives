@@ -1,0 +1,229 @@
+<!-- pagina-oficial.html -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pagina-oficial.css') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+    <link rel="shortcut icon" href="static\public\favicon.ico" type="image/x-icon">
+    <title>Crypto Archives</title>
+</head>
+<body>
+    <div class="pagina-oficial">
+        <div class="gallery" id="gallery">
+            {% for image in images %}
+                <div class="gallery-item" data-filename="{{ image }}">
+                    <img src="{{ url_for('download_file', filename=image) }}" alt="{{ image }}">
+                    <p>{{ image }}</p>
+                    <a href="{{ url_for('download_file', filename=image) }}">Download</a>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="pagina-oficial-child"></div>
+        <div class="pagina-oficial-item"></div>
+        <div class="pagina-oficial-inner"></div>
+        <div class="line-div"></div>
+        <div class="pagina-oficial-child1"></div>
+        
+        
+        <div class="pagina-oficial-child2"></div>
+        <div class="pagina-oficial-child3"></div>
+        <div class="pesquisa">
+          <div class="pesquisar-arquivo">Pesquisar arquivo</div>
+            <div class="pesquisa-child"></div>
+        </div>
+        <div id="context-menu" class="context-menu">
+            <ul>
+                <li id="move-to-trash">Deletar</li>
+            </ul>
+        </div>
+
+        <div class="profile">
+            <img class="icon-person" alt="" src="{{ url_for('static', filename='public/-icon-person.svg') }}">
+            <img class="ellipse-icon" alt="" src="{{ url_for('static', filename='public/ellipse-4.svg') }}">
+            <div id="profile-menu" class="profile-menu">
+                <ul>
+                    <li><a href="#">Meu Perfil</a></li>
+                    <li><a href="#">Configurações</a></li>
+                    <li><a href="#" id="logout">Sair</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="upload">
+            <form id="upload-form" enctype="multipart/form-data">
+                <label for="file-upload" class="custom-file-upload">UPLOAD</label>
+                <input id="file-upload" type="file" name="file">
+            </form>
+        </div>
+
+        <div class="pesquisa">
+          <input type="text" id="search-input" placeholder="Pesquisar arquivo">
+        </div>
+
+        <div class="recentes">
+            <button id="recentes">Recentes</button>
+            <img class="icon-clock" alt="" src="{{ url_for('static', filename='public/-icon-clock.svg') }}">
+        </div>
+
+        <div class="meus-arquivos">
+            <button id="meusArquivos">Meus Arquivos</button>
+            <img class="icon-document" alt="" src="{{ url_for('static', filename='public/-icon-document.svg') }}">
+        </div>
+
+        <div class="lixeira">
+            <button id="lixeira">Lixeira</button>
+            <img class="icon-trash" alt="" src="{{ url_for('static', filename='public/-icon-trash.svg') }}">
+        </div>
+
+        <img class="icon-magnifying-glass" alt="" src="{{ url_for('static', filename='public/-icon-magnifying-glass.svg') }}">
+        <img class="logo-foda-1" alt="" src="{{ url_for('static', filename='public/logo-foda-1@2x.png') }}" id="logoFoda1">
+
+    </div>
+
+    <script>
+        document.getElementById('file-upload').addEventListener('change', function() {
+            var form = document.getElementById('upload-form');
+            var formData = new FormData(form);
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                location.reload();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+
+
+        const contextMenu = document.getElementById('context-menu');
+        let selectedGalleryItem = null;
+
+        document.addEventListener('contextmenu', function(event) {
+            if (event.target.closest('.gallery-item')) {
+                event.preventDefault();
+                selectedGalleryItem = event.target.closest('.gallery-item');
+                contextMenu.style.top = `${event.pageY}px`;
+                contextMenu.style.left = `${event.pageX}px`;
+                contextMenu.classList.add('active');
+            } else {
+                contextMenu.classList.remove('active');
+            }
+        });
+
+        document.addEventListener('click', function() {
+            contextMenu.classList.remove('active');
+        });
+
+        document.getElementById('move-to-trash').addEventListener('click', function() {
+          if (selectedGalleryItem) {
+            const filename = selectedGalleryItem.getAttribute('data-filename');
+            fetch(`/move_to_trash/${filename}`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ filename: filename })
+            })
+            .then(response => response.json())
+            .then(data => {
+          if (data.status === 'success') {
+                selectedGalleryItem.remove();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+          });
+          selectedGalleryItem = null;
+          contextMenu.classList.remove('active');
+    }
+});
+
+        document.getElementById('move-to-trash').addEventListener('click', function() {
+            if (selectedGalleryItem) {
+                const filename = selectedGalleryItem.getAttribute('data-filename');
+                fetch(`/delete/${filename}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ filename: filename })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        selectedGalleryItem.remove();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+                selectedGalleryItem = null;
+                contextMenu.classList.remove('active');
+            }
+        });
+
+        document.getElementById('recentes').addEventListener('click', function() {
+            window.location.href = "{{ url_for('oficial') }}";
+        });
+
+        document.getElementById('meusArquivos').addEventListener('click', function() {
+            window.location.href = "{{ url_for('oficial') }}";
+        });
+
+        document.getElementById('lixeira').addEventListener('click', function() {
+            window.location.href = "{{ url_for('lixeira') }}";
+        });
+
+        const profileIcon = document.querySelector('.profile');
+        const profileMenu = document.getElementById('profile-menu');
+
+        profileIcon.addEventListener('click', function(event) {
+            profileMenu.classList.toggle('active');
+            event.stopPropagation();
+        });
+
+        document.addEventListener('click', function() {
+            profileMenu.classList.remove('active');
+        });
+
+        profileMenu.addEventListener('click', function(event) {
+            event.stopPropagation();
+        });
+
+        document.getElementById('logout').addEventListener('click', function() {
+            window.location.href = "{{ url_for('logout') }}";
+        });
+
+        document.getElementById('search-input').addEventListener('input', function() {
+            const query = this.value.toLowerCase();
+            fetch(`/search?q=${query}`)
+                .then(response => response.json())
+                .then(data => {
+                    const gallery = document.getElementById('gallery');
+                    gallery.innerHTML = '';
+                    data.files.forEach(file => {
+                        const div = document.createElement('div');
+                        div.className = 'gallery-item';
+                        div.setAttribute('data-filename', file);
+                        div.innerHTML = `
+                            <img src="${file}" alt="${file}">
+                            <p>${file}</p>
+                            <a href="/download/${file}">Download</a>
+                        `;
+                        gallery.appendChild(div);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+
+    </script>
+</body>
+</html>

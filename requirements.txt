@@ -1,0 +1,6 @@
+# pip install -r requirements.txt
+
+pip install mnemonic
+pip install flask
+pip install pysqlite3
+pip install flask-session
