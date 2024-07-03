@@ -127,11 +127,18 @@ button {
   left: 20%;
   overflow: hidden;
   max-height: 100%;
-  background-color: #1f1d22;
+  background: linear-gradient(135deg, #1f1d22, #38343d); /* Adicionei um gradiente */
   border-radius: 9%;
+  border: none; /* Removi a borda padrão */
   color: white;
+  cursor: pointer; /* Mudei o cursor para pointer */
+  transition: background 0.3s, box-shadow 0.3s; /* Adicionei transições suaves */
 }
 
+button:hover {
+  background: linear-gradient(135deg, #38343d, #1f1d22); /* Inverti o gradiente no hover */
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15); /* Aumentei a sombra no hover */
+}
 #search-input {
   margin-top: 3%;
   width: 80%;
