@@ -40,6 +40,15 @@
             {% endfor %}
         </div>
 
+        <div class="trash-gallery">
+            {% for image in images %}
+            <div class="gallery-item">
+                <img src="{{ url_for('static', filename='trash/' ~ session['email'] ~ '/' ~ image) }}" alt="{{ image }}">
+                <button onclick="restoreFromTrash('{{ image }}')">Restaurar</button>
+            </div>
+            {% endfor %}
+        </div>
+
         <div class="pagina-oficial-child"></div>
         <div class="pagina-oficial-item"></div>
         <div class="pagina-oficial-inner"></div>
@@ -132,6 +141,19 @@
         document.getElementById('logout').addEventListener('click', function() {
             window.location.href = "{{ url_for('logout') }}";
         });
+
+        function restoreFromTrash(filename) {
+        fetch(`/restore_from_trash/${filename}`, {
+            method: 'POST'
+        }).then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                location.reload();  // Atualiza a página após restaurar o arquivo
+            } else {
+                alert('Erro ao restaurar o arquivo');
+            }
+        });
+    }
 
         </script>
     </div>
