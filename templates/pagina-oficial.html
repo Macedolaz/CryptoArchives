@@ -11,6 +11,9 @@
     <title>Crypto Archives</title>
 </head>
 <body>
+
+
+
     <div class="pagina-oficial">
         <div class="gallery" id="gallery">
             {% for image in images %}
@@ -21,6 +24,7 @@
                 </div>
             {% endfor %}
         </div>
+
         <div class="pagina-oficial-child"></div>
         <div class="pagina-oficial-item"></div>
         <div class="pagina-oficial-inner"></div>
@@ -37,6 +41,7 @@
         <div id="context-menu" class="context-menu">
             <ul>
                 <li id="move-to-trash">Deletar</li>
+                <li id="share-file">Compartilhar</li>
             </ul>
         </div>
 
@@ -223,6 +228,35 @@
                     console.error('Error:', error);
                 });
         });
+
+ // Handle share action
+ document.getElementById('share-file').addEventListener('click', function() {
+            if (selectedGalleryItem) {
+                const imageName = selectedGalleryItem.querySelector('p').textContent.trim();
+                fetch(`/share/${imageName}`)
+                .then(response => response.text())
+                .then(link => {
+                    prompt('Link de compartilhamento gerado:', link);
+                })
+                .catch(error => {
+                    console.error('Erro ao gerar link de compartilhamento:', error);
+                });
+                contextMenu.classList.remove('active');
+            }
+        });
+
+        function moveToTrash(filename) {
+        fetch(`/move_to_trash/${filename}`, {
+            method: 'POST'
+        }).then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                location.reload();  // Atualiza a página após mover para a lixeira
+            } else {
+                alert('Erro ao mover para a lixeira');
+            }
+        });
+    }
 
     </script>
 </body>
