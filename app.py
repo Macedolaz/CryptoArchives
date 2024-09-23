@@ -18,6 +18,9 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+# Certifique-se que a pasta da lixeira existe
+os.makedirs(TRASH_FOLDER, exist_ok=True)
+
 # Conectar ao banco de dados SQLite
 conn = sqlite3.connect('usuarios.db', check_same_thread=False)
 c = conn.cursor()
@@ -100,7 +103,7 @@ def oficial():
 def lixeira():
     if 'email' not in session:
         return redirect('/login')
-
+    
     user_email = session.get('email')
     if not user_email:
         return redirect('/login')
@@ -109,6 +112,8 @@ def lixeira():
         os.makedirs(user_folder)
     images = os.listdir(user_folder)
     return render_template('lixeira.html', images=images)
+    
+
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
@@ -145,6 +150,7 @@ def upload_file():
         conn.commit()
 
         return redirect(url_for('oficial'))
+    
 
 @app.route('/download/<filename>', methods=['GET'])
 def download_file(filename):
@@ -191,6 +197,11 @@ def search_files():
 
     return jsonify({'files': matching_files})
 
+# Rota para gerar um link de compartilhamento
+@app.route('/share/<filename>', methods=['GET'])
+def share_file(filename):
+    file_url = url_for('static', filename=f'uploads/{filename}', _external=True)
+    return file_url
     
 @app.route('/move_to_trash/<filename>', methods=['POST'])
 def move_to_trash(filename):
@@ -206,6 +217,27 @@ def move_to_trash(filename):
     if os.path.exists(source_path):
         os.rename(source_path, target_path)
         c.execute("UPDATE arquivos SET trashed = 1 WHERE user_email = ? AND filename = ?", (user_email, filename))
+        conn.commit()
+        return jsonify({'status': 'success'})
+    else:
+        return "Arquivo não encontrado", 404
+    
+@app.route('/restore_from_trash/<filename>', methods=['POST'])
+def restore_from_trash(filename):
+    if 'email' not in session:
+        return redirect('/login')
+
+    user_email = session.get('email')
+    if not user_email:
+        return redirect('/login')
+    
+    source_path = os.path.join(TRASH_FOLDER, user_email, filename)
+    target_path = os.path.join(UPLOAD_FOLDER, user_email, filename)
+
+    if os.path.exists(source_path):
+        # Mover o arquivo da lixeira de volta para a galeria
+        os.rename(source_path, target_path)
+        c.execute("UPDATE arquivos SET trashed = 0 WHERE user_email = ? AND filename = ?", (user_email, filename))
         conn.commit()
         return jsonify({'status': 'success'})
     else:
@@ -249,6 +281,7 @@ def list_files():
     user_folder = os.path.join(app.config['UPLOAD_FOLDER'], user_email)
     files = os.listdir(user_folder)
     return jsonify({'files': files})
+
 
 
 # Rota para lidar com o registro de novos usuários
@@ -306,6 +339,7 @@ def enviar_email_verificacao(email, frase_semente):
         print("Email enviado com sucesso!")  # Log de sucesso
     except Exception as e:
         print(f"Erro ao enviar email: {e}")  # Log de erro
+
 
 if __name__ == '__main__':
     if not os.path.exists(UPLOAD_FOLDER):
